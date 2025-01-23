@@ -1,0 +1,39 @@
+# Pliki tymczasowe edytorów
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+.DS_Store
+
+# Katalogi kompilacji Arduino IDE
+/build/
+.arduino15/
+.vscode/
+
+# Pliki konfiguracyjne Arduino IDE
+*.elf
+*.bin
+*.hex
+*.map
+*.a
+*.d
+*.o
+*.dmp
+
+# Pliki zależności kompilacji
+*.dep
+*.cmd
+*.dwo
+
+# Katalogi SDK i konfiguracje ESP32
+sdkconfig
+sdkconfig.old
+sdkconfig.defaults
+
+# Pliki specyficzne dla platformy
+Thumbs.db
+desktop.ini
+
+# Biblioteki i zależności (opcjonalnie, jeśli pobierasz je ręcznie)
+# libraries/
