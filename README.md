@@ -7,6 +7,8 @@ I decided to build nanotank, using recommended electronics and provided 3D desig
 
 System is based on client-server architecture. The web server is hosted on the XIAO ESP32S3 and the website is uploaded to it's memory with the help of SPIFFS. Image frames, one after another, are being sent via async http server (MJPEG). As soon as client enters the page, there is opened WebSocket connection, which allows to steer the vehicle.
 
+https://github.com/user-attachments/assets/15a5b86b-67b6-4ed3-abb2-540a1dd06c21
+
 ## Pinout Connections
 
 ![](extras/electronics/nanotank_electronics.png)
@@ -48,8 +50,6 @@ https://shawnhymel.com/1882/how-to-create-a-web-server-with-websockets-using-an-
 #### Camera stream on  AsyncWebServer
 Streaming live footage based on:\
 https://gist.github.com/me-no-dev/d34fba51a8f059ac559bf62002e61aa3 
-## Demo Video
-https://github.com/user-attachments/assets/15a5b86b-67b6-4ed3-abb2-540a1dd06c21
 
 
 
