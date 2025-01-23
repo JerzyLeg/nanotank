@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tank Controller</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<script language="javascript" type="text/javascript">
+  //var ip_address = "192.168.156.181";
+  var ip_address = "192.168.156.62";
+  var url = `ws://${ip_address}:1337/`;
+  //var output;
+  var context1;
+  var context2;
+  var context3;
+  var context4;
+  //buttons and canvas
+  var button1;
+  var canvas1;
+  var button2;
+  var canvas2;
+  var button3;
+  var canvas3;
+  var button4;
+  var canvas4;
+
+  // This is called when the page finishes loading
+  function init() {
+    // Assign page elements to variables
+    button1 = document.getElementById("toggleButton1");
+    button2 = document.getElementById("toggleButton2");
+    button3 = document.getElementById("toggleButton3");
+    button4 = document.getElementById("toggleButton4");
+
+    //output = document.getElementById("output");
+    canvas1 = document.getElementById("sign1");
+    canvas2 = document.getElementById("sign2");
+    canvas3 = document.getElementById("sign3");
+    canvas4 = document.getElementById("sign4");
+
+    // Draw circle in canvas
+    context1 = canvas1.getContext("2d");
+    context1.arc(25, 25, 15, 0, Math.PI * 2, false);
+    context1.lineWidth = 3;
+    context1.strokeStyle = "black";
+    context1.stroke();
+    context1.fillStyle = "black";
+    context1.fill();
+
+    // Draw circle in canvas
+    context2 = canvas2.getContext("2d");
+    context2.arc(25, 25, 15, 0, Math.PI * 2, false);
+    context2.lineWidth = 3;
+    context2.strokeStyle = "black";
+    context2.stroke();
+    context2.fillStyle = "black";
+    context2.fill();
+
+    // Draw circle in canvas
+    context3 = canvas3.getContext("2d");
+    context3.arc(25, 25, 15, 0, Math.PI * 2, false);
+    context3.lineWidth = 3;
+    context3.strokeStyle = "black";
+    context3.stroke();
+    context3.fillStyle = "black";
+    context3.fill();
+
+    // Draw circle in canvas
+    context4 = canvas4.getContext("2d");
+    context4.arc(25, 25, 15, 0, Math.PI * 2, false);
+    context4.lineWidth = 3;
+    context4.strokeStyle = "black";
+    context4.stroke();
+    context4.fillStyle = "black";
+    context4.fill();
+
+    // Connect to WebSocket server
+    wsConnect(url);
+  }
+
+  // Call this to connect to the WebSocket server
+  function wsConnect(url) {
+    // Connect to WebSocket server
+    websocket = new WebSocket(url);
+
+    // Assign callbacks
+    websocket.onopen = function (evt) {
+      onOpen(evt);
+    };
+    websocket.onclose = function (evt) {
+      onClose(evt);
+    };
+    websocket.onmessage = function (evt) {
+      onMessage(evt);
+    };
+    websocket.onerror = function (evt) {
+      onError(evt);
+    };
+  }
+
+  // Called when a WebSocket connection is established with the server
+  function onOpen(evt) {
+    // Log connection state
+    console.log("Connected");
+
+    // Enable button
+    button1.disabled = false;
+    button2.disabled = false;
+    button3.disabled = false;
+    button4.disabled = false;
+
+    // Get the current state of the LED
+    doSend("stateForwardMotor0");
+    doSend("stateBackwardMotor0");
+    doSend("stateForwardMotor1");
+    doSend("stateBackwardMotor1");
+  }
+
+  // Called when the WebSocket connection is closed
+  function onClose(evt) {
+    // Log disconnection state
+    console.log("Disconnected");
+
+    // Disable button
+    button1.disabled = true;
+    button2.disabled = true;
+    button3.disabled = true;
+    button4.disabled = true;
+
+    // Try to reconnect after a few seconds
+    setTimeout(function () {
+      wsConnect(url);
+    }, 2000);
+  }
+
+  // Called when a message is received from the server
+  function onMessage(evt) {
+    // Print out our received message
+    console.log("Received: " + evt.data);
+
+    // Parse the message to get motor01forwardbackward state and canvas identifier -->
+    const messageParts = evt.data.split(":");
+    if (messageParts.length !== 2) {
+      console.error("Invalid message format");
+      return;
+    }
+
+    const canvasId = messageParts[0];
+    const motorState = messageParts[1];
+
+    // Get the corresponding context based on canvas identifier
+    let context;
+    switch (canvasId) {
+      case "motorAforward":
+        context = context1;
+        break;
+      case "motorAbackward":
+        context = context2;
+        break;
+      case "motorBforward":
+        context = context3;
+        break;
+      case "motorBbackward":
+        context = context4;
+        break;
+      default:
+        console.error("Unknown canvas identifier: " + canvasId);
+        return;
+    }
+    // Update canvas graphic based on motor state
+    context.fillStyle = motorState === "1" ? "lime" : "black";
+    context.fill();
+  }
+
+  // Called when a WebSocket error occurs
+  function onError(evt) {
+    console.log("ERROR: " + evt.data);
+  }
+
+  // Sends a message to the server (and prints it to the console)
+  function doSend(message) {
+    console.log("Sending: " + message);
+    websocket.send(message);
+  }
+  // Called whenever the HTML button is pressed
+  function onPress1() {
+    doSend("moveForwardMotorA");
+    doSend("stateForwardMotorA");
+    doSend("stateBackwardMotorA");
+  }
+  function onPress2() {
+    doSend("moveBackwardMotorA");
+    doSend("stateBackwardMotorA");
+    doSend("stateForwardMotorA");
+  }
+  function onPress3() {
+    doSend("moveForwardMotorB");
+    doSend("stateForwardMotorB");
+    doSend("stateBackwardMotorB");
+  }
+  function onPress4() {
+    doSend("moveBackwardMotorB");
+    doSend("stateBackwardMotorB");
+    doSend("stateForwardMotorB");
+  }
+
+  // Call the init function as soon as the page loads
+  window.addEventListener("load", init, false);
+</script>
+
+<body>
+  <!-- MJPEG stream -->
+  <div class="stream-container">
+    <!-- Using the IP address variable for the image source URL -->
+    <img id="stream" src="" alt="Whoopsy daisy, there should be fpv..." />
+    <!-- <img src="http://192.168.156.181/stream" /> -->
+  </div>
+
+  <!-- Motor Control -->
+  <div class="control-container">
+    <table>
+      <tr>
+        <td>
+          <button id="toggleButton1" onclick="onPress1()" disabled>
+            FORWARD LEFT
+          </button>
+        </td>
+        <td><canvas id="sign1" width="50" height="50"></canvas></td>
+        <td><canvas id="sign3" width="50" height="50"></canvas></td>
+        <td>
+          <button id="toggleButton3" onclick="onPress3()" disabled>
+            FORWARD RIGHT
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button id="toggleButton2" onclick="onPress2()" disabled>
+            BACKWARD LEFT
+          </button>
+        </td>
+        <td><canvas id="sign2" width="50" height="50"></canvas></td>
+        <td><canvas id="sign4" width="50" height="50"></canvas></td>
+        <td>
+          <button id="toggleButton4" onclick="onPress4()" disabled>
+            BACKWARD RIGHT
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <script type="text/javascript">
+    // Set the stream source dynamically using the ip_address variable
+    document.getElementById("stream").src = `http://${ip_address}/stream`;
+  </script>
+</body>
+
+</html>
